@@ -8,11 +8,20 @@ import (
 )
 
 func main() {
+	c0 := make(chan int)
+	c1 := make(chan int)
+	go readOut(c0)
+	go sqrt(c0, c1)
+	printGopher(c1)
+}
+
+func readOut(downstream chan int) {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "стоп" {
+			close(downstream)
 			return
 		}
 		l, err := strconv.Atoi(line)
@@ -20,37 +29,24 @@ func main() {
 			fmt.Println("не верно", err)
 			continue
 		}
-		fmt.Println(l)
-		intFirstChan := make(chan int)
-		intFirstChan <- l
-		close(intFirstChan)
-		//sqrt(intFirstChan)
-		//var wg sync.WaitGroup
-		//wg.Add(2)
-		//go sqrt(intFirstChan)
-		multiplication(sqrt(intFirstChan))
-		//wg.Wait()
+		fmt.Println("вы ввели число", l)
+		downstream <- l
 	}
 }
-func sqrt(s chan int) chan int{
-	y := <-s
-	intSecondChan := make(chan int)
-	go func() {
-		fmt.Println("получаемое значение для возведения в квадрат", y)
-		y = y * y
-		fmt.Println("значение в квадрате равно",  y)
-		intSecondChan <- y
-		close(intSecondChan)
-	}()
-	return intSecondChan
+
+func sqrt(upstream, downstream chan int){
+	for  item := range upstream {
+		fmt.Println("получаемое значение для возведения в квадрат", item)
+		x := item * item
+		fmt.Println("значение в квадрате равно", x)
+		downstream <- x
+	}
+	close(downstream)
 }
-func multiplication(y chan int) int{
-	go func() int{
-		x:= <- y
-		fmt.Println("число, которое умножаем на два",x)
-		x = x * 2
-		fmt.Println("ПРОИЗВЕДЕНИЕ НА два",x)
-		return x
-	}()
-	return 847
+
+func printGopher(upstream chan int) {
+	x:= <- upstream
+	fmt.Println("число, которое умножаем на два",x)
+	x = x * 2
+	fmt.Println("ПРОИЗВЕДЕНИЕ НА два",x)
 }
