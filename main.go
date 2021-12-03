@@ -45,7 +45,6 @@ func readOut(downstream chan int, wg *sync.WaitGroup) {
 		downstream <- l
 	}
 }
-
 func sqrt(upstream, downstream chan int, wg *sync.WaitGroup){
 	wg.Add(1)
 	defer func() {
@@ -63,7 +62,6 @@ func sqrt(upstream, downstream chan int, wg *sync.WaitGroup){
 		downstream <- x
 	}
 }
-
 func printGopher(upstream chan int, wg *sync.WaitGroup) {
 	defer func() {
 		fmt.Println("множитель на два завершает работу")
