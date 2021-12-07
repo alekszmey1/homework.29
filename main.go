@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+	fmt.Println("запускается функция main")
 	var wg sync.WaitGroup
 	c0 := make(chan int)
 	c1 := make(chan int)
@@ -21,6 +22,7 @@ func main() {
 
 func readOut(downstream chan int, wg *sync.WaitGroup) {
 	wg.Add(1)
+	fmt.Println("запускается функция чтение")
 	defer func() {
 		fmt.Println("считыватель завершает работу")
 		wg.Done()
@@ -32,6 +34,7 @@ func readOut(downstream chan int, wg *sync.WaitGroup) {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
+		fmt.Println("запускается цикл по сканированию")
 		line := scanner.Text()
 		if line == "стоп" {
 			break
@@ -47,6 +50,7 @@ func readOut(downstream chan int, wg *sync.WaitGroup) {
 }
 func sqrt(upstream, downstream chan int, wg *sync.WaitGroup){
 	wg.Add(1)
+	fmt.Println("запускается функция по возведению квадрата")
 	defer func() {
 		fmt.Println("множитель завершает работу")
 		wg.Done()
@@ -56,6 +60,7 @@ func sqrt(upstream, downstream chan int, wg *sync.WaitGroup){
 		close(downstream)
 	}()
 	for  item := range upstream {
+		fmt.Println("запустился цикл в функции по возведению в квадрат")
 		fmt.Println("получаемое значение для возведения в квадрат", item)
 		x := item * item
 		fmt.Println("значение в квадрате равно", x)
@@ -63,11 +68,14 @@ func sqrt(upstream, downstream chan int, wg *sync.WaitGroup){
 	}
 }
 func printGopher(upstream chan int, wg *sync.WaitGroup) {
+	wg.Add(1)
+	fmt.Println("запускается функция по умножению на два")
 	defer func() {
 		fmt.Println("множитель на два завершает работу")
 		wg.Done()
 	}()
 	for  x := range upstream {
+		fmt.Println("запускается цикл по умножению на два")
 		fmt.Println("число, которое умножаем на два", x)
 		y := x * 2
 		fmt.Println("ПРОИЗВЕДЕНИЕ НА два", y)
